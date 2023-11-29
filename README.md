@@ -15,7 +15,7 @@
 3. Set up a `data/<datasetname>.yml` file for yolo to train to
 4. Clone the yolo repository from 
 5. Run yolo training using `python train.py --data <path_to_dataset_definition>.yaml --project ohw --name <training_name> --img 1280 --batch-size 8 --epochs 300` 
-
+6. Otherwise, use [this tutorial](https://github.com/ultralytics/yolov5/blob/master/tutorial.ipynb) from the Yolo Creators themselves how to use in a notebook
 
 ### Running inference
 #### Running on a folder to get visuals
@@ -28,6 +28,7 @@
 
 #### Running on a folder to get label files
 1. Get the image files uploaded
+	* are already in a `.png` format. usually require conversion from sony's ARW (using OpenCV custom script or commandline imagemagick)
 2. Make changes to the `inference_single_image` notebook
 	* argument parser?
 	* set output directory?
