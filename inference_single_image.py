@@ -1,3 +1,15 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.15.2
+# ---
+
 import os
 from tqdm import tqdm
 
@@ -34,7 +46,7 @@ def convert_bbox_coco2yolo(img_w, img_h, bbox):
     w = w*dw
     h = h*dh
     return x, y, w, h
-    
+
 def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
     # print(pred)
     img_w = pred.image_width
