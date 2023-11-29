@@ -17,6 +17,7 @@ ament-uncrustify==0.12.6
 ament-xmllint==0.12.6
 angles==1.15.0
 asttokens==2.2.1
+attrs @ file:///home/conda/feedstock_root/build_artifacts/attrs_1683424013410/work
 backcall==0.2.0
 boto3==1.28.37
 botocore==1.31.37
@@ -43,6 +44,7 @@ examples-rclpy-minimal-publisher==0.15.1
 examples-rclpy-minimal-service==0.15.1
 examples-rclpy-minimal-subscriber==0.15.1
 executing==1.2.0
+fastjsonschema @ file:///home/conda/feedstock_root/build_artifacts/python-fastjsonschema_1700055509243/work/dist
 filelock==3.12.2
 fire==0.5.0
 fonttools==4.41.1
@@ -65,6 +67,10 @@ jedi==0.18.2
 Jinja2==3.1.2
 jmespath==1.0.1
 joblib==1.3.1
+jsonschema @ file:///home/conda/feedstock_root/build_artifacts/jsonschema-meta_1700159890288/work
+jsonschema-specifications @ file:///home/conda/feedstock_root/build_artifacts/jsonschema-specifications_1700059145511/work
+jupyter_core @ file:///home/conda/feedstock_root/build_artifacts/jupyter_core_1698673647215/work
+jupytext @ file:///home/conda/feedstock_root/build_artifacts/jupytext_1694949895363/work
 kiwisolver==1.4.4
 laser-geometry==2.4.0
 launch==1.0.4
@@ -78,12 +84,16 @@ lit==16.0.6
 logging-demo==0.20.3
 map-msgs==2.1.0
 Markdown==3.4.3
+markdown-it-py @ file:///home/conda/feedstock_root/build_artifacts/markdown-it-py_1686175045316/work
 MarkupSafe==2.1.3
 matplotlib==3.7.2
 matplotlib-inline==0.1.6
+mdit-py-plugins @ file:///home/conda/feedstock_root/build_artifacts/mdit-py-plugins_1686175351422/work
+mdurl @ file:///home/conda/feedstock_root/build_artifacts/mdurl_1639515908913/work
 message-filters==4.3.3
 mpmath==1.3.0
 nav-msgs==4.2.3
+nbformat @ file:///home/conda/feedstock_root/build_artifacts/nbformat_1690814868471/work
 networkx==3.1
 numpy==1.24.4
 nvidia-cublas-cu11==11.10.3.66
@@ -108,6 +118,8 @@ pendulum-msgs==0.20.3
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==10.0.0
+pkgutil_resolve_name @ file:///home/conda/feedstock_root/build_artifacts/pkgutil-resolve-name_1694617248815/work
+platformdirs @ file:///home/conda/feedstock_root/build_artifacts/platformdirs_1699715570510/work
 prompt-toolkit==3.0.39
 protobuf==4.23.4
 psutil==5.9.5
@@ -123,7 +135,7 @@ pyparsing==3.0.9
 python-dateutil==2.8.2
 python-qt-binding==1.1.1
 pytz==2023.3
-PyYAML==6.0.1
+PyYAML @ file:///home/conda/feedstock_root/build_artifacts/pyyaml_1695373436676/work
 qt-dotgraph==2.2.2
 qt-gui==2.2.2
 qt-gui-cpp==2.2.2
@@ -133,6 +145,7 @@ rawpy==0.18.1
 rcl-interfaces==1.2.1
 rclpy==3.3.8
 rcutils==5.1.3
+referencing @ file:///home/conda/feedstock_root/build_artifacts/referencing_1700053204647/work
 requests==2.31.0
 requests-oauthlib==1.3.1
 resource-retriever==3.1.1
@@ -169,6 +182,7 @@ rosidl-typesupport-fastrtps-c==2.2.0
 rosidl-typesupport-fastrtps-cpp==2.2.0
 rosidl-typesupport-introspection-c==3.1.4
 rosidl-typesupport-introspection-cpp==3.1.4
+rpds-py @ file:///home/conda/feedstock_root/build_artifacts/rpds-py_1700526972087/work
 rpyutils==0.2.1
 rqt-action==2.0.1
 rqt-bag==1.1.4
@@ -217,11 +231,12 @@ tf2-py==0.25.2
 tf2-ros-py==0.25.2
 tf2-tools==0.25.2
 thop==0.1.1.post2209072238
+toml @ file:///home/conda/feedstock_root/build_artifacts/toml_1604308577558/work
 topic-monitor==0.20.3
 torch==2.0.1
 torchvision==0.15.2
 tqdm==4.65.0
-traitlets==5.9.0
+traitlets @ file:///home/conda/feedstock_root/build_artifacts/traitlets_1701095650114/work
 trajectory-msgs==4.2.3
 triton==2.0.0
 turtlesim==1.4.2
