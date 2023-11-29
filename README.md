@@ -20,16 +20,18 @@
 ### Running inference
 #### Running on a folder to get visuals
 1. Get the image files uploaded
-2. Make changes to the `inference_for_yolov5.py` script to make it usable as a notebook
+2. Get the model file uploaded 
+3. Make changes to the `inference_for_yolov5.py` script to make it usable as a notebook
 	* change model path to use the appropriate model
 	* change folder path to run on the appropriate dataset
-3. Run the script `inference_for_yolov5.py`
-4. Inspect visuals in output folder
+4. Run the script `inference_for_yolov5.py`
+5. Inspect visuals in output folder
 
 #### Running on a folder to get label files
 1. Get the image files uploaded
 	* are already in a `.png` format. usually require conversion from sony's ARW (using OpenCV custom script or commandline imagemagick)
-2. Make changes to the `inference_single_image` notebook
+2. Get the model file uploaded
+3. Make changes to the `inference_single_image` notebook
 	* argument parser?
 	* set output directory?
-3. inspect label files
+4. inspect label files
