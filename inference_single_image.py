@@ -22,16 +22,19 @@ from argparse import ArgumentParser
 
 
 def parse_args():
+    fdir = os.path.abspath(os.path.dirname(__file__))
+    datadir = os.path.join(fdir, '..', 'data', 'inference')
+    outdir = os.path.join(datadir, "labels")
     parser = ArgumentParser(description="File for creating labels on a folder of inference images using SAHI")
-    parser.add_argument("-i", "--input", required=True, type=str, help="Location of the input folder")
-    parser.add_argument("-o", "--output", required=True, help="which output folder to put the labels to")
+    parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
+    parser.add_argument("-o", "--output", required=False, help="which output folder to put the labels to", default=outdir)
     args = parser.parse_args()
     return vars(args)
 
 # Converting with custom functions:
 # https://haobin-tan.netlify.app/ai/computer-vision/object-detection/coco-json-to-yolo-txt/
-def convert_bbox_coco2yolo(img_w, img_h, bbox):
-    x_tl, y_tl, w, h = bbox
+def convert_bbox_coco2yolo(img_w, img_h, pred_info):
+    x_tl, y_tl, w, h = pred_info[0]
     dw = 1.0 / img_w
     dh = 1.0 / img_h
 
@@ -45,23 +48,21 @@ def convert_bbox_coco2yolo(img_w, img_h, bbox):
     y = y_c * dh
     w = w*dw
     h = h*dh
-    return x, y, w, h
+    return x, y, w, h, pred_info[1], pred_info[2]
 
 def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
     # print(pred)
     img_w = pred.image_width
     img_h = pred.image_height
     # cats = [bbox.to_coco_annotation()["category_id"] for bbox in pred.object_prediction_list]
-    cc_annot = [bbox.to_coco_annotation() for bbox in pred.object_prediction_list]
-    bboxes = [an.bbox for an in cc_annot]
-    cats = [an.category_id for an in cc_annot]
-    yolo_bboxes = [convert_bbox_coco2yolo(img_w, img_h, bbox) for bbox in bboxes]
+    pred_infos = [(bbox.to_coco_annotation().bbox, bbox.score.value, bbox.category.id) for bbox in pred.object_prediction_list]
+    # pred_infos = [(an.bbox, an.score, an.category_id) for an in cc_annot]
+    yolo_bboxes = [convert_bbox_coco2yolo(img_w, img_h, pred_info) for pred_info in pred_infos]
     if not yolo_bboxes: return
-    cat = 0
     outf = os.path.join(target_dir, img_name + ".txt")
     with open(outf, "w") as out:
-        for x, y, w, h in yolo_bboxes:
-            out.write(f"{cat} {x:.6f} {y:.6f} {w:.6f} {h:.6f}")    
+        for x, y, w, h, score, category_id in yolo_bboxes:
+            out.write(f"{category_id} {x:.6f} {y:.6f} {w:.6f} {h:.6f} {score:.6f}\n")    
 
 if __name__=="__main__":
     args = parse_args()
