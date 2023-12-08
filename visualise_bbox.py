@@ -13,6 +13,15 @@ np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 ALLOWED_EXTENSIONS = set(['jpg', 'JPEG', 'JPG', 'PNG', 'png', 'jpeg'])
 
+def getcolor(conf : np.ndarray) -> np.ndarray:
+    """
+        function to map a confidence value into an RGB value 
+    """
+    outc = np.zeros((3), dtype=int)
+    t =   255. * np.asarray([2. * conf, 2. * (1. - conf), 20. / 255.])
+    outc = t.astype(int)
+    return outc.tolist()
+
 def xywhn2xyxy(x, w=640, h=640, padw=0, padh=0):
     """
         Straight from Yolo. utils/general.py
@@ -79,11 +88,11 @@ def visualize_object_predictions(
     # return
     for row in someret:
         category_name = "OHW"       # row[0]
-        score = "1.0"
+        score = row[4]
 
         # set color
         if color is None:
-            color = color(object_prediction.category.id)
+            color = getcolor(score)
         # set bbox points
         p1, p2 = (int(row[0]), int(row[1])), (int(row[2]), int(row[3]))
         # visualize boxes
@@ -136,16 +145,20 @@ def flatten_lists(l):
 
 if __name__=="__main__":
     # potential todo - wrap this in a dataloader?
-    fdir = os.path.abspath(os.path.dirname(os.path.basename(__file__)))
-    root_folder = os.path.join(fdir, "test_vis", "1cm","RXR")
+    fdir = os.path.abspath(os.path.dirname(__file__))
+    root_folder = os.path.abspath(os.path.join(fdir, '..', '..', "test_vis", "test_conf","test"))
+    # root_folder = os.path.join(fdir, '..', 'data')
     # root_folder = os.path.join(fdir, "test_vis")
     # load images from folder
+    # img_fs = os.path.join(root_folder, "inference")
     img_fs = os.path.join(root_folder, "images")
     # load labels from other folder
+    # labels = os.path.join(img_fs, "labels")
     labels = os.path.join(root_folder, "labels")
 
     # export directory
-    export_dir = os.path.join(root_folder, "visuals")
+    # export_dir = os.path.join(root_folder, "visuals")
+    export_dir = None
 
     plPath = Path(img_fs)
     lPath = Path(labels)
@@ -160,7 +173,7 @@ if __name__=="__main__":
     visual_hide_labels: bool = False,
     visual_hide_conf: bool = False,
     visual_export_format: str = "png"
-    color = (57, 255, 20)  # model predictions in neon-green
+    # color = (57, 255, 20)  # model predictions in neon-green
 
     for lf in tqdm(label_list, desc="Label: ", leave=False):
         ln = os.path.basename(lf).split(".")[0]
@@ -179,7 +192,7 @@ if __name__=="__main__":
             rect_th=visual_bbox_thickness,
             text_size=visual_text_size,
             text_th=visual_text_thickness,
-            color=color,
+            # color=color,
             hide_labels=visual_hide_labels,
             hide_conf=visual_hide_conf,
             output_dir=export_dir,
