@@ -12,8 +12,10 @@
 
 import os
 from tqdm import tqdm
+import time
 
 # import required functions, classes
+import torch
 from sahi import AutoDetectionModel
 from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
@@ -100,6 +102,10 @@ if __name__=="__main__":
         verbose=2,
     )
 
+    print("Running on device:{}".format(
+        torch.cuda.get_device_properties(0) if torch.cuda.is_available() else "CPU - No GPU used"
+    ))
+    elapsed_time = time.time()
     for ind, image_path in enumerate(
             tqdm(image_iterator, f"Performing inference on {source_image_dir}")
         ):
@@ -116,3 +122,7 @@ if __name__=="__main__":
         imgf = os.path.basename(image_path).split(".")[0]
         convert_pred_to_txt(result, target_dir, imgf)
 
+    elapsed_time = time.time() - elapsed_time
+    print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(
+        elapsed_time, len(image_iterator), elapsed_time / len(image_iterator)
+    ))
