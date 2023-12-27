@@ -8,7 +8,7 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 from itertools import chain
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from utils import getcolor, getlw
+from utils import getcolor, getlw, check_boundaries
 np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 
@@ -38,6 +38,7 @@ def visualize_object_predictions(
     output_dir: str = None,
     file_name: str = "prediction_visual",
     export_format: str = "png",
+    padding_px : int = 0,
 ):
     """
     Visualizes prediction category names, bounding boxes over the source image
@@ -70,7 +71,7 @@ def visualize_object_predictions(
     # add bboxes to image if present
     w = image.shape[1]
     h = image.shape[0]
-    someret = xywhn2xyxy(object_prediction_list[:,1:], w, h)
+    someret = xywhn2xyxy(object_prediction_list[:,1:], w, h, padh=padding_px, padw=padding_px)
 
     # bbox = object_prediction.bbox.to_xyxy()
     # todo: now iterate through every line in someret
@@ -86,6 +87,8 @@ def visualize_object_predictions(
             color = getcolor(score)
         # set bbox points
         p1, p2 = (int(row[0]), int(row[1])), (int(row[2]), int(row[3]))
+        p1_n = check_boundaries(p1, w, h)
+        p2_n = check_boundaries(p2, w, h)
         # visualize boxes
         cv2.rectangle(
             image,
@@ -138,12 +141,14 @@ if __name__=="__main__":
     # potential todo - wrap this in a dataloader?
     fdir = os.path.abspath(os.path.dirname(__file__))
     # root_folder = os.path.abspath(os.path.join(fdir, '..', '..', "test_vis", "test_conf","test"))
-    root_folder = os.path.abspath(os.path.join(fdir, "data", "vis"))
+    # root_folder = os.path.abspath(os.path.join(fdir, "data", "vis"))
+    root_folder = os.path.abspath(os.path.join(fdir, "data", "inference", "png"))
     # root_folder = os.path.join(fdir, '..', 'data')
     # root_folder = os.path.join(fdir, "test_vis")
     # load images from folder
     # img_fs = os.path.join(root_folder, "inference")
-    img_fs = os.path.join(root_folder, "images")
+    # img_fs = os.path.join(root_folder, "images")
+    img_fs = os.path.join(root_folder)
     # load labels from other folder
     # labels = os.path.join(img_fs, "labels")
     labels = os.path.join(root_folder, "labels")
@@ -165,6 +170,7 @@ if __name__=="__main__":
     visual_hide_labels: bool = False,
     visual_hide_conf: bool = False,
     visual_export_format: str = "png"
+    padding_px = 70
     # color = (57, 255, 20)  # model predictions in neon-green
 
     for lf in tqdm(label_list, desc="Label: ", leave=False):
@@ -190,4 +196,5 @@ if __name__=="__main__":
             output_dir=export_dir,
             file_name=ln + "_vis" ,
             export_format=visual_export_format,
+            padding_px=padding_px
         )
