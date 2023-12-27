@@ -28,12 +28,13 @@ IMAGE_EXTENSIONS += [".arw"]
 
 def parse_args():
     fdir = os.path.abspath(os.path.dirname(__file__))
-    datadir = os.path.join(fdir, 'data', 'inference', 'arw')
+    datadir = os.path.join(fdir, 'data', 'inference', 'png')
     outdir = os.path.join(datadir, "labels")
     parser = ArgumentParser(description="File for creating labels on a folder of inference images using SAHI")
     parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
     parser.add_argument("-o", "--output", required=False, help="which output folder to put the labels to", default=outdir)
     parser.add_argument("-m", "--model", default=None, help="Path to model file. If None given, will take first file from <config> directory")
+    parser.add_argument("-c", "--confidence", default=0.01, type=float, help="Which confidence value to use as threshold for displaying. Defaults to 0.01")
     args = parser.parse_args()
     return vars(args)
 
@@ -104,7 +105,7 @@ if __name__=="__main__":
     detection_model = AutoDetectionModel.from_pretrained(
         model_type='yolov5',
         model_path=model_path,
-        confidence_threshold=0.4,
+        confidence_threshold=args["confidence"],
         device="cuda:0", # or 'cuda:0'
     )
 
