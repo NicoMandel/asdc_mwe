@@ -13,6 +13,7 @@
 import os
 from tqdm import tqdm
 import time
+from argparse import ArgumentParser
 
 # import required functions, classes
 import torch
@@ -20,16 +21,19 @@ from sahi import AutoDetectionModel
 from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
-from argparse import ArgumentParser
 
+from utils import find_model_files, read_arw_as_pil
+
+IMAGE_EXTENSIONS += [".arw"]
 
 def parse_args():
     fdir = os.path.abspath(os.path.dirname(__file__))
-    datadir = os.path.join(fdir, '..', 'data', 'inference')
+    datadir = os.path.join(fdir, 'data', 'inference', 'arw')
     outdir = os.path.join(datadir, "labels")
     parser = ArgumentParser(description="File for creating labels on a folder of inference images using SAHI")
     parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
     parser.add_argument("-o", "--output", required=False, help="which output folder to put the labels to", default=outdir)
+    parser.add_argument("-m", "--model", default=None, help="Path to model file. If None given, will take first file from <config> directory")
     args = parser.parse_args()
     return vars(args)
 
@@ -68,7 +72,16 @@ def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
 
 if __name__=="__main__":
     args = parse_args()
-    yolov5_model_path = "yolov5/ohw/combined_m_2/weights/best.pt"
+
+    # getting the model
+    if args["model"] == None:
+        fdir = os.path.abspath(os.path.dirname(__file__))
+        confdir = os.path.join(fdir, "config")
+        mfs = find_model_files(confdir)
+        yolov5_model_path = mfs[0]
+    else:
+        yolov5_model_path = args["model"]
+
     model_type = "yolov5"
     model_path = yolov5_model_path
     model_device = "cuda:0" # or 'cuda:0'
@@ -109,7 +122,10 @@ if __name__=="__main__":
     for ind, image_path in enumerate(
             tqdm(image_iterator, f"Performing inference on {source_image_dir}")
         ):
-        image_as_pil = read_image_as_pil(image_path)
+        if image_path.endswith("ARW"):
+            image_as_pil = read_arw_as_pil(image_path)
+        else:
+            image_as_pil = read_image_as_pil(image_path)
         # test_img = "data/OHW/Inference/test_ds/DSC00009.png"
         result = get_sliced_prediction(
             image_as_pil,
