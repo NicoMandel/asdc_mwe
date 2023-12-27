@@ -4,6 +4,12 @@
 `.pt` files are kept in the `config` subfolder.
 Default data directories should be stored as subdirectories in the `data` folder
 
+## Installation order
+1. install miniconda (see online instructions)
+2. install conda environment through `conda env install -f environment.yml`
+3. install pip into conda environment through `conda install pip`
+4. install rest of requirements through pip `pip install -r pipreq.txt --default-timeout=100`
+
 ## Processes attempted to get working
 1. Train a model
 2. Inference with a model
