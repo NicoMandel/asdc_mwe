@@ -1,5 +1,9 @@
 # Trying to get things to work on ASDC
 
+## Default folder structure
+`.pt` files are kept in the `config` subfolder.
+Default data directories should be stored as subdirectories in the `data` folder
+
 ## Processes attempted to get working
 1. Train a model
 2. Inference with a model
