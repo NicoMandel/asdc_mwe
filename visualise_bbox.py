@@ -8,19 +8,11 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 from itertools import chain
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from utils import getcolor
 np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 
 ALLOWED_EXTENSIONS = set(['jpg', 'JPEG', 'JPG', 'PNG', 'png', 'jpeg'])
-
-def getcolor(conf : np.ndarray) -> np.ndarray:
-    """
-        function to map a confidence value into an RGB value 
-    """
-    outc = np.zeros((3), dtype=int)
-    t =   255. * np.asarray([2. * conf, 2. * (1. - conf), 20. / 255.])
-    outc = t.astype(int)
-    return outc.tolist()
 
 def xywhn2xyxy(x, w=640, h=640, padw=0, padh=0):
     """
@@ -146,7 +138,8 @@ def flatten_lists(l):
 if __name__=="__main__":
     # potential todo - wrap this in a dataloader?
     fdir = os.path.abspath(os.path.dirname(__file__))
-    root_folder = os.path.abspath(os.path.join(fdir, '..', '..', "test_vis", "test_conf","test"))
+    # root_folder = os.path.abspath(os.path.join(fdir, '..', '..', "test_vis", "test_conf","test"))
+    root_folder = os.path.abspath(os.path.join(fdir, "data", "vis"))
     # root_folder = os.path.join(fdir, '..', 'data')
     # root_folder = os.path.join(fdir, "test_vis")
     # load images from folder

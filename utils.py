@@ -21,3 +21,15 @@ def read_arw_as_pil(fpath : str) -> Image.Image:
     """
     np_arr = load_arw(fpath)
     return Image.fromarray(np_arr)
+
+def getcolor(conf : np.ndarray) -> np.ndarray:
+    """
+        function to map a confidence value into an RGB value.
+        yellow is (255, 255, 0)
+        blue is (0, 0, 255)
+        black is (0, 0, 0)
+    """
+    outc = np.zeros((3), dtype=int)
+    t =   255. * np.asarray([10. / 255. , 10. / 255., 1. - conf])
+    outc = t.astype(int)
+    return outc.tolist()
