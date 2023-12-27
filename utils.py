@@ -34,12 +34,6 @@ def getcolor(conf : np.ndarray) -> np.ndarray:
     outc = t.astype(int)
     return outc.tolist()
 
-def getlw() -> int:
-    """
-        Function to get the line width
-    """
-    return 15
-
 def _check_boundaries(p : int, ub : int, lb : int = 0) -> tuple:
     """
         Function to check whether a point is out of bounds of the image.

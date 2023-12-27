@@ -8,7 +8,7 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 from itertools import chain
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from utils import getcolor, getlw, check_boundaries
+from utils import getcolor, check_boundaries
 np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 
@@ -20,8 +20,8 @@ def xywhn2xyxy(x, w=640, h=640, padw=0, padh=0):
     """
     # Convert nx4 boxes from [x, y, w, h] normalized to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
     y = np.copy(x)
-    y[..., 0] = w * (x[..., 0] - x[..., 2] / 2) + padw  # top left x
-    y[..., 1] = h * (x[..., 1] - x[..., 3] / 2) + padh  # top left y
+    y[..., 0] = w * (x[..., 0] - x[..., 2] / 2) - padw  # top left x
+    y[..., 1] = h * (x[..., 1] - x[..., 3] / 2) - padh  # top left y
     y[..., 2] = w * (x[..., 0] + x[..., 2] / 2) + padw  # bottom right x
     y[..., 3] = h * (x[..., 1] + x[..., 3] / 2) + padh  # bottom right y
     return y
@@ -59,8 +59,7 @@ def visualize_object_predictions(
     # deepcopy image so that original is not altered
     image = copy.deepcopy(image)
     # set rect_th for boxes
-    # rect_th = rect_th or max(round(sum(image.shape) / 2 * 0.003), 2)
-    rect_th = getlw()
+    rect_th = rect_th or max(round(sum(image.shape) / 2 * 0.003), 2)
     # set text_th for category names
     # text_th = text_th or max(rect_th - 1, 1)
     text_th =  max(rect_th - 1, 1)
@@ -87,8 +86,8 @@ def visualize_object_predictions(
             color = getcolor(score)
         # set bbox points
         p1, p2 = (int(row[0]), int(row[1])), (int(row[2]), int(row[3]))
-        p1_n = check_boundaries(p1, w, h)
-        p2_n = check_boundaries(p2, w, h)
+        p1 = check_boundaries(p1, w, h)
+        p2 = check_boundaries(p2, w, h)
         # visualize boxes
         cv2.rectangle(
             image,
@@ -164,11 +163,11 @@ if __name__=="__main__":
     label_list = list([x for x in lPath.glob("*.txt")])
 
     # image font settings
-    visual_bbox_thickness: int = None,
-    visual_text_size: float = None,
-    visual_text_thickness: int = None,
-    visual_hide_labels: bool = False,
-    visual_hide_conf: bool = False,
+    visual_bbox_thickness: int = 15
+    visual_text_size: float = None
+    visual_text_thickness: int = None
+    visual_hide_labels: bool = True
+    visual_hide_conf: bool = False
     visual_export_format: str = "png"
     padding_px = 70
     # color = (57, 255, 20)  # model predictions in neon-green
