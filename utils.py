@@ -33,3 +33,9 @@ def getcolor(conf : np.ndarray) -> np.ndarray:
     t =   255. * np.asarray([10. / 255. , 10. / 255., 1. - conf])
     outc = t.astype(int)
     return outc.tolist()
+
+def getlw() -> int:
+    """
+        Function to get the line width
+    """
+    return 15

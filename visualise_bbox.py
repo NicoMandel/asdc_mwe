@@ -8,7 +8,7 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 from itertools import chain
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from utils import getcolor
+from utils import getcolor, getlw
 np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 
@@ -59,8 +59,7 @@ def visualize_object_predictions(
     image = copy.deepcopy(image)
     # set rect_th for boxes
     # rect_th = rect_th or max(round(sum(image.shape) / 2 * 0.003), 2)
-    rect_th = max(round(sum(image.shape) / 2 * 0.003), 2)
-    rect_th = 2
+    rect_th = getlw()
     # set text_th for category names
     # text_th = text_th or max(rect_th - 1, 1)
     text_th =  max(rect_th - 1, 1)
