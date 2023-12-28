@@ -15,6 +15,7 @@ from tqdm import tqdm
 import time
 from argparse import ArgumentParser
 import numpy as np
+import matplotlib.pyplot as plt
 
 # import required functions, classes
 import torch
@@ -24,13 +25,15 @@ from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
 from utils import find_model_files, read_arw_as_pil, read_config
+from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
 
 def parse_args():
     fdir = os.path.abspath(os.path.dirname(__file__))
-    datadir = os.path.join(fdir, 'data', 'inference', 'png')
-    outdir = os.path.join(datadir, "labels")
+    datadir = os.path.join(fdir, 'data', 'inference', 'arw')
+    # outdir = os.path.join(datadir, "visuals")
+    outdir = None
     conff = os.path.join(fdir, 'config', 'sahi_config.yaml')
     parser = ArgumentParser(description="File for creating labels on a folder of inference images using SAHI")
     parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
@@ -79,7 +82,7 @@ def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
 
 def convert_pred_to_np(pred : np.ndarray) -> np.ndarray:
     yolo_bboxes = convert_pred(pred)
-    return yolo_bboxes
+    return np.asarray(yolo_bboxes)
 
 if __name__=="__main__":
     args = parse_args()
@@ -155,7 +158,21 @@ if __name__=="__main__":
         
         # converting to numpy format
         bbox_np = convert_pred_to_np(result)
-        print("Test debug line")
+        
+        visualize_object_predictions(
+            np.ascontiguousarray(image_as_pil),
+            object_prediction_list=bbox_np,
+            rect_th=bbox_thickness,
+            text_size=None,
+            text_th=None,
+            # color: tuple = None,
+            hide_labels=hide_labels,
+            hide_conf=False,
+            output_dir=target_dir,
+            file_name=imgf + "_vis",
+            export_format=export_format,
+            padding_px= padding_px,
+        )
 
     elapsed_time = time.time() - elapsed_time
     print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(
