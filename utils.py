@@ -3,6 +3,7 @@ from pathlib import Path
 import rawpy
 import numpy as np
 from PIL import Image
+import yaml
 
 def find_model_files(dir : str) -> list:
     p = Path(dir)
@@ -48,3 +49,24 @@ def check_boundaries(p : tuple, w : int, h : int) -> tuple:
     p1_checked = _check_boundaries(p[0], w)
     p2_checked = _check_boundaries(p[1], h)
     return (p1_checked, p2_checked)
+
+def uniquify(path : str) -> str:
+    """
+        Function to turn a path into a unique path if it already exists
+    """
+    filen, ext = os.path.splitext(path)
+    counter = 1
+    # addstr = "youalmostdeletedyourdatayoudummy"
+    while os.path.exists(path):
+        path = filen + "(" + str(counter) + ")" + ext
+        counter +=1 
+    
+    return path
+
+def read_config(path : str) -> dict:
+    """
+        Utility function to read yaml config file and return
+    """
+    with open(path, 'r') as f:
+        rd = yaml.safe_load(f)
+    return rd

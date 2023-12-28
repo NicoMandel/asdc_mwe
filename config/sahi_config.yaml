@@ -1,0 +1,11 @@
+model_confidence_threshold: 0.1
+slice_height: 1280
+slice_width: 1280
+overlap_height_ratio: 0.3
+overlap_width_ratio: 0.3
+
+# visualisation settings
+padding_px: 70
+bbox_thickness:  15
+export_format:  "png"
+hide_labels: True
