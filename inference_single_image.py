@@ -22,7 +22,7 @@ from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
-from utils import find_model_files, read_arw_as_pil
+from utils import find_model_files, read_arw_as_pil, convert_pred_to_txt
 
 IMAGE_EXTENSIONS += [".arw"]
 
@@ -37,39 +37,6 @@ def parse_args():
     parser.add_argument("-c", "--confidence", default=0.01, type=float, help="Which confidence value to use as threshold for displaying. Defaults to 0.01")
     args = parser.parse_args()
     return vars(args)
-
-# Converting with custom functions:
-# https://haobin-tan.netlify.app/ai/computer-vision/object-detection/coco-json-to-yolo-txt/
-def convert_bbox_coco2yolo(img_w, img_h, pred_info):
-    x_tl, y_tl, w, h = pred_info[0]
-    dw = 1.0 / img_w
-    dh = 1.0 / img_h
-
-    x_c = x_tl + w / 2.
-    y_c = y_tl + h / 2.
-
-    x = x_c * dw
-    y = y_c * dh
-
-    x = x_c * dw
-    y = y_c * dh
-    w = w*dw
-    h = h*dh
-    return x, y, w, h, pred_info[1], pred_info[2]
-
-def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
-    # print(pred)
-    img_w = pred.image_width
-    img_h = pred.image_height
-    # cats = [bbox.to_coco_annotation()["category_id"] for bbox in pred.object_prediction_list]
-    pred_infos = [(bbox.to_coco_annotation().bbox, bbox.score.value, bbox.category.id) for bbox in pred.object_prediction_list]
-    # pred_infos = [(an.bbox, an.score, an.category_id) for an in cc_annot]
-    yolo_bboxes = [convert_bbox_coco2yolo(img_w, img_h, pred_info) for pred_info in pred_infos]
-    if not yolo_bboxes: return
-    outf = os.path.join(target_dir, img_name + ".txt")
-    with open(outf, "w") as out:
-        for x, y, w, h, score, category_id in yolo_bboxes:
-            out.write(f"{category_id} {x:.6f} {y:.6f} {w:.6f} {h:.6f} {score:.6f}\n")    
 
 if __name__=="__main__":
     args = parse_args()

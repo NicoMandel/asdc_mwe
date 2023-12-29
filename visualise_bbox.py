@@ -1,6 +1,7 @@
 import os.path
 import time
 import copy
+import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from pathlib import Path
@@ -8,7 +9,7 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 from itertools import chain
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from utils import getcolor, check_boundaries
+from utils import getcolor, check_boundaries, save_image, show_image
 np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 
@@ -35,11 +36,8 @@ def visualize_object_predictions(
     color: tuple = None,
     hide_labels: bool = False,
     hide_conf: bool = False,
-    output_dir: str = None,
-    file_name: str = "prediction_visual",
-    export_format: str = "png",
     padding_px : int = 0,
-):
+) -> tuple:
     """
     Visualizes prediction category names, bounding boxes over the source image
     and exports it to output folder.
@@ -118,20 +116,8 @@ def visualize_object_predictions(
                 (255, 255, 255),
                 thickness=text_th,
             )
-
-    # export if output_dir is present
-    if output_dir is not None:
-        # export image with predictions
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
-        # save inference result
-        save_path = str(Path(output_dir) / (file_name + "." + export_format))
-        cv2.imwrite(save_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
-    else:
-        plt.imshow(image)
-        plt.show()
-
     elapsed_time = time.time() - elapsed_time
-    return {"image": image, "elapsed_time": elapsed_time}
+    return image, elapsed_time
 
 def flatten_lists(l):
     return list(chain.from_iterable(l))
@@ -183,7 +169,7 @@ if __name__=="__main__":
         # test
         csvfor = np.genfromtxt(lf, delimiter=" ", ndmin=2)
 
-        visualize_object_predictions(
+        image, el_time = visualize_object_predictions(
             np.ascontiguousarray(img),
             object_prediction_list=csvfor,
             rect_th=visual_bbox_thickness,
@@ -192,8 +178,9 @@ if __name__=="__main__":
             # color=color,
             hide_labels=visual_hide_labels,
             hide_conf=visual_hide_conf,
-            output_dir=export_dir,
-            file_name=ln + "_vis" ,
-            export_format=visual_export_format,
             padding_px=padding_px
         )
+        if export_dir is not None:
+            save_image(image, export_dir, file_name=ln+"_vis", export_format=visual_export_format)
+        else:
+            show_image(image)

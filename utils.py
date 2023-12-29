@@ -1,9 +1,13 @@
 import os.path
+
 from pathlib import Path
 import rawpy
 import numpy as np
 from PIL import Image
 import yaml
+import matplotlib
+import matplotlib.pyplot as plt
+import cv2
 
 def find_model_files(dir : str) -> list:
     p = Path(dir)
@@ -70,3 +74,57 @@ def read_config(path : str) -> dict:
     with open(path, 'r') as f:
         rd = yaml.safe_load(f)
     return rd
+
+def save_image(image : np.ndarray, output_dir : str, file_name : str, export_format : str = "png"):
+    # export image with predictions
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    # save inference result
+    save_path = str(Path(output_dir) / (file_name + "." + export_format))
+    cv2.imwrite(save_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
+def show_image(image : np.ndarray):
+    print(matplotlib.get_backend())
+
+    plt.imshow(image)
+    plt.show()
+
+# Converting with custom functions:
+# https://haobin-tan.netlify.app/ai/computer-vision/object-detection/coco-json-to-yolo-txt/
+def convert_bbox_coco2yolo(img_w, img_h, pred_info):
+    x_tl, y_tl, w, h = pred_info[0]
+    dw = 1.0 / img_w
+    dh = 1.0 / img_h
+
+    x_c = x_tl + w / 2.
+    y_c = y_tl + h / 2.
+
+    x = x_c * dw
+    y = y_c * dh
+
+    x = x_c * dw
+    y = y_c * dh
+    w = w*dw
+    h = h*dh
+    return pred_info[2], x, y, w, h, pred_info[1]
+
+def convert_pred(pred):
+    img_w = pred.image_width
+    img_h = pred.image_height
+    # cats = [bbox.to_coco_annotation()["category_id"] for bbox in pred.object_prediction_list]
+    pred_infos = [(bbox.to_coco_annotation().bbox, bbox.score.value, bbox.category.id) for bbox in pred.object_prediction_list]
+    # pred_infos = [(an.bbox, an.score, an.category_id) for an in cc_annot]
+    yolo_bboxes = [convert_bbox_coco2yolo(img_w, img_h, pred_info) for pred_info in pred_infos]
+    if not yolo_bboxes: yolo_bboxes = None
+    return yolo_bboxes
+
+def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
+    # print(pred)
+    yolo_bboxes = convert_pred(pred)
+    outf = os.path.join(target_dir, img_name + ".txt")
+    with open(outf, "w") as out:
+        for x, y, w, h, score, category_id in yolo_bboxes:
+            out.write(f"{category_id} {x:.6f} {y:.6f} {w:.6f} {h:.6f} {score:.6f}\n")
+
+def convert_pred_to_np(pred : np.ndarray) -> np.ndarray:
+    yolo_bboxes = convert_pred(pred)
+    return np.asarray(yolo_bboxes)
