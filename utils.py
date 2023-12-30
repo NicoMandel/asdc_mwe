@@ -132,3 +132,9 @@ def convert_pred_to_np(pred : np.ndarray) -> np.ndarray:
 def list_subdirectories(path : str) -> list:
     sdl = [os.path.join(path, x) for x in os.listdir(path) if os.path.isdir(os.path.join(path, x))]
     return sdl
+
+def get_detections_dir(site_path : str) -> str:
+    bn = os.path.basename(os.path.normpath(site_path))
+    outp = os.path.join(site_path, bn + "_Detections")
+    outp = uniquify(outp)
+    return outp

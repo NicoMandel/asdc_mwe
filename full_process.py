@@ -26,7 +26,8 @@ from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
-from utils import find_model_files, read_arw_as_pil, read_config, save_image, convert_pred_to_np, list_subdirectories
+from utils import find_model_files, read_arw_as_pil, read_config, save_image, convert_pred_to_np, list_subdirectories\
+,get_detections_dir
 from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
@@ -99,6 +100,17 @@ if __name__=="__main__":
     else:
         process_dirs = [source_dir]
         print("Processing single flight: {}".format(process_dirs))
+
+    # folder setup - only if out bool is set
+    if out_bool:
+        # if flight flag is not set
+        if not flight:
+            target_dir = get_detections_dir(source_dir)
+            os.makedirs(target_dir, exist_ok=True)
+            print("Writing to: {}".format(target_dir))
+        else:
+            pass
+    
     
     for source_image_dir in tqdm(process_dirs, leave=True):
 
