@@ -128,3 +128,7 @@ def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
 def convert_pred_to_np(pred : np.ndarray) -> np.ndarray:
     yolo_bboxes = convert_pred(pred)
     return np.asarray(yolo_bboxes)
+
+def list_subdirectories(path : str) -> list:
+    sdl = [os.path.join(path, x) for x in os.listdir(path) if os.path.isdir(os.path.join(path, x))]
+    return sdl
