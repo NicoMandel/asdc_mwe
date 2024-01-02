@@ -35,7 +35,7 @@ def getcolor(conf : np.ndarray) -> np.ndarray:
         black is (0, 0, 0)
     """
     outc = np.zeros((3), dtype=int)
-    t =   255. * np.asarray([10. / 255. , 10. / 255., 1. - conf])
+    t =   255. * np.asarray([0. , 0., conf])
     outc = t.astype(int)
     return outc.tolist()
 
