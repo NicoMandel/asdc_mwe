@@ -24,7 +24,7 @@ def parse_args():
     datadir = os.path.join(fdir, 'data', 'inference', 'arw')
 
     conff = os.path.join(fdir, 'config', 'sahi_config.yaml')
-    parser = ArgumentParser(description="Script for running the full inference process on a output inference images using SAHI")
+    parser = ArgumentParser(description="Script for running the full inference process on a Single FLIGHT. Inference images using SAHI")
     parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
     parser.add_argument("-o", "--output", action="store_true", help="Boolean value. If given, will create output folder structure")
     parser.add_argument("-m", "--model", default=None, help="Path to model file. If None given, will take first .pt file from <config> directory")
@@ -61,6 +61,7 @@ if __name__=="__main__":
     out_bool = args["output"]           # used to create output folders
     source_dir = os.path.abspath(args["input"])
     
+    # TODO - jump in here to start anew
     process_dirs = list_subdirectories(source_dir, contains="flight")
     print("Processing site directory {} with {} flights".format(source_dir, len(process_dirs)))
     
