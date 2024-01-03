@@ -143,6 +143,14 @@ def get_detections_dir(site_path : str) -> str:
     # outp = uniquify_dir(outp)
     return outp
 
+def get_flight_target_dir(flight_inputdir : str) -> str:
+    sp = os.path.normpath(flight_inputdir)
+    flight_name = os.path.basename(sp)
+    site_name = os.path.dirname(sp)
+    site_outname = get_detections_dir(site_name)
+    flight_target = os.path.join(site_outname, flight_name)
+    return flight_target
+
 def get_model(path : str, confidence : float, model_type : str = "yolov5" , model_device : str = "cuda:0") -> AutoDetectionModel:
     if path == None:
         fdir = os.path.abspath(os.path.dirname(__file__))

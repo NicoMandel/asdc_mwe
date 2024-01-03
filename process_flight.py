@@ -13,8 +13,8 @@ from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
-from utils import find_model_files, read_arw_as_pil, read_config, save_image, convert_pred_to_np, list_subdirectories\
-,get_detections_dir, get_model
+from utils import read_arw_as_pil, read_config, save_image, convert_pred_to_np\
+,get_detections_dir, get_model, get_flight_target_dir
 from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
@@ -60,77 +60,63 @@ if __name__=="__main__":
     # Folders
     out_bool = args["output"]           # used to create output folders
     source_dir = os.path.abspath(args["input"])
-    
-    # TODO - jump in here to start anew
-    process_dirs = list_subdirectories(source_dir, contains="flight")
-    print("Processing site directory {} with {} flights".format(source_dir, len(process_dirs)))
-    
-    # check on found input directories
-    assert process_dirs, "No subdirectories to process found. Please double check. Original input dir was {}".format(source_dir)
-
+     
     # folder setup - only if out bool is set
     if out_bool:
-        target_dir = get_detections_dir(source_dir)
-        os.makedirs(target_dir, exist_ok=True)
-        print("Writing to: {}".format(target_dir))
+        target_subdir = get_flight_target_dir(source_dir)
+        os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
+        print("Created subdirectory {} for visuals".format(target_subdir))
 
-    for source_subdir in tqdm(process_dirs, leave=True):
-        if out_bool:
-            target_subdir = os.path.join(target_dir, source_subdir)
-            os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
-            print("Created subdirectory {} for visuals".format(target_subdir))
+    # Get single image result prediction
+    image_iterator = list_files(
+        directory=source_dir,
+        contains=IMAGE_EXTENSIONS,
+        verbose=2,
+    )
 
-        source_image_dir = os.path.join(source_dir, source_subdir)
-        # Get single image result prediction
-        image_iterator = list_files(
-            directory=source_image_dir,
-            contains=IMAGE_EXTENSIONS,
-            verbose=2,
+    elapsed_time = time.time()
+    for ind, image_path in enumerate(
+            tqdm(image_iterator, f"Performing inference on {source_dir}", leave=True)
+        ):
+        if image_path.endswith("ARW"):
+            image_as_pil = read_arw_as_pil(image_path)
+        else:
+            image_as_pil = read_image_as_pil(image_path)
+
+        result = get_sliced_prediction(
+            image_as_pil,
+            detection_model,
+            slice_height = slice_height,
+            slice_width = slice_width,
+            overlap_height_ratio = overlap_height_ratio,
+            overlap_width_ratio = overlap_width_ratio
+        )
+        imgf = os.path.basename(image_path).split(".")[0]
+        
+        # converting to numpy format
+        bbox_np = convert_pred_to_np(result)
+        
+        image, _ = visualize_object_predictions(
+            np.ascontiguousarray(image_as_pil),
+            object_prediction_list=bbox_np,
+            rect_th=bbox_thickness,
+            text_size=None,
+            text_th=None,
+            # color: tuple = None,
+            hide_labels=hide_labels,
+            hide_conf=False,
+            padding_px= padding_px,
         )
 
-        elapsed_time = time.time()
-        for ind, image_path in enumerate(
-                tqdm(image_iterator, f"Performing inference on {source_image_dir}", leave=True)
-            ):
-            if image_path.endswith("ARW"):
-                image_as_pil = read_arw_as_pil(image_path)
-            else:
-                image_as_pil = read_image_as_pil(image_path)
+        if out_bool:
+            save_image(image, target_subdir, imgf + "_vis",  export_format)
+        else:
+            matplotlib.use('TkAgg')
+            print(matplotlib.get_backend())
+            plt.imshow(image)
+            plt.show()
 
-            result = get_sliced_prediction(
-                image_as_pil,
-                detection_model,
-                slice_height = slice_height,
-                slice_width = slice_width,
-                overlap_height_ratio = overlap_height_ratio,
-                overlap_width_ratio = overlap_width_ratio
-            )
-            imgf = os.path.basename(image_path).split(".")[0]
-            
-            # converting to numpy format
-            bbox_np = convert_pred_to_np(result)
-            
-            image, _ = visualize_object_predictions(
-                np.ascontiguousarray(image_as_pil),
-                object_prediction_list=bbox_np,
-                rect_th=bbox_thickness,
-                text_size=None,
-                text_th=None,
-                # color: tuple = None,
-                hide_labels=hide_labels,
-                hide_conf=False,
-                padding_px= padding_px,
-            )
-
-            if out_bool:
-                save_image(image, target_subdir, imgf + "_vis",  export_format)
-            else:
-                matplotlib.use('TkAgg')
-                print(matplotlib.get_backend())
-                plt.imshow(image)
-                plt.show()
-
-        elapsed_time = time.time() - elapsed_time
-        print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(
-            elapsed_time, len(image_iterator), elapsed_time / len(image_iterator)
-        ))
+    elapsed_time = time.time() - elapsed_time
+    print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(
+        elapsed_time, len(image_iterator), elapsed_time / len(image_iterator)
+    ))
