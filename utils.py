@@ -8,6 +8,7 @@ import yaml
 import matplotlib
 import matplotlib.pyplot as plt
 import cv2
+from sahi import AutoDetectionModel
 
 def find_model_files(dir : str) -> list:
     p = Path(dir)
@@ -54,15 +55,16 @@ def check_boundaries(p : tuple, w : int, h : int) -> tuple:
     p2_checked = _check_boundaries(p[1], h)
     return (p1_checked, p2_checked)
 
-def uniquify(path : str) -> str:
+def uniquify_dir(path : str) -> str:
     """
-        Function to turn a path into a unique path if it already exists
+        Function to turn a directory path into a unique path if it already exists
     """
-    filen, ext = os.path.splitext(path)
+    bd = os.path.dirname(path)
+    bn = os.path.basename(path)
     counter = 1
     # addstr = "youalmostdeletedyourdatayoudummy"
     while os.path.exists(path):
-        path = filen + "(" + str(counter) + ")" + ext
+        path = os.path.join(bd, bn + "(" + str(counter) + ")")
         counter +=1 
     
     return path
@@ -129,12 +131,33 @@ def convert_pred_to_np(pred : np.ndarray) -> np.ndarray:
     yolo_bboxes = convert_pred(pred)
     return np.asarray(yolo_bboxes)
 
-def list_subdirectories(path : str) -> list:
-    sdl = [os.path.join(path, x) for x in os.listdir(path) if os.path.isdir(os.path.join(path, x))]
+def list_subdirectories(path : str, contains : list = []) -> list:
+    sdl = [x for x in os.listdir(path) if os.path.isdir(os.path.join(path, x)) and contains in x.lower()]
     return sdl
 
 def get_detections_dir(site_path : str) -> str:
-    bn = os.path.basename(os.path.normpath(site_path))
-    outp = os.path.join(site_path, bn + "_Detections")
-    outp = uniquify(outp)
+    sp = os.path.normpath(site_path)
+    bn = os.path.basename(sp)
+    pd = os.path.dirname(sp)
+    outp = os.path.join(pd, bn + "_Detections")
+    # outp = uniquify_dir(outp)
     return outp
+
+def get_model(path : str, confidence : float, model_type : str = "yolov5" , model_device : str = "cuda:0") -> AutoDetectionModel:
+    if path == None:
+        fdir = os.path.abspath(os.path.dirname(__file__))
+        confdir = os.path.join(fdir, "config")
+        mfs = find_model_files(confdir)
+        model_path = mfs[0]
+    else:
+        model_path = path
+
+    detection_model = AutoDetectionModel.from_pretrained(
+        model_type=model_type,
+        model_path=model_path,
+        confidence_threshold=confidence,
+        device=model_device, # or 'cuda:0'
+    )
+
+    return detection_model
+    
