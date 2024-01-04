@@ -22,7 +22,7 @@ from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
-from utils import find_model_files, read_arw_as_pil, convert_pred_to_txt
+from model_utils import find_model_files, read_arw_as_pil, convert_pred_to_txt
 
 IMAGE_EXTENSIONS += [".arw"]
 

@@ -13,8 +13,8 @@ from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
-from utils import read_arw_as_pil, read_config, save_image, convert_pred_to_np, list_subdirectories\
-,get_detections_dir, get_model, get_labels_dir, convert_pred_to_txt
+from model_utils import read_arw_as_pil, save_image, convert_pred_to_np, get_model, convert_pred_to_txt
+from file_utils import get_detections_dir, get_labels_dir, read_config, list_subdirectories
 from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
