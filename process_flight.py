@@ -66,14 +66,14 @@ if __name__=="__main__":
     if out_bool:
         target_subdir = get_flight_dir(source_dir)
         os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
-        print("Created subdirectory {} for visuals".format(target_subdir))
+        print("Writing images to subdirectory {}".format(target_subdir))
 
     # Label folders
     label_bool = args["labels"]
     if label_bool:
         label_dir = get_flight_dir(source_dir, "labels")
-        os.makedirs(label_dir, exist_ok=False)
-        print("Created subdirectory {} for labels".format(label_dir))
+        os.makedirs(label_dir, exist_ok=True)
+        print("Writing labels to subdirectory {}".format(label_dir))
 
     # Get single image result prediction
     image_iterator = list_files(

@@ -78,20 +78,19 @@ if __name__=="__main__":
     label_bool = args["labels"]
     if label_bool:
         label_dir = get_labels_dir(source_dir)
-        os.makedirs(label_dir, exist_ok=False)
+        os.makedirs(label_dir, exist_ok=True)
         print("Writing labels to: {}".format(label_dir))
-
 
     for source_subdir in tqdm(process_dirs, leave=True):
         if out_bool:
             target_subdir = os.path.join(target_dir, source_subdir)
             os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
-            print("Created subdirectory {} for visuals".format(target_subdir))
+            print("Writing visuals to {}".format(target_subdir))
         
         if label_bool:
             label_subdir = os.path.join(label_dir, source_subdir)
             os.makedirs(label_subdir, exist_ok=False)
-            print("Created subdirectory {} for labels".format(label_subdir))
+            print("Writing labels to {}".format(label_subdir))
         
 
         source_image_dir = os.path.join(source_dir, source_subdir)
