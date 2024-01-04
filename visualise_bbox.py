@@ -9,7 +9,7 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 from itertools import chain
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from utils import getcolor, check_boundaries, save_image, show_image
+from model_utils import getcolor, check_boundaries, save_image, show_image
 np.set_printoptions(precision=6, suppress=True, linewidth=10000, edgeitems=30)
 
 
