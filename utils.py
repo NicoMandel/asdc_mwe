@@ -135,19 +135,22 @@ def list_subdirectories(path : str, contains : list = []) -> list:
     sdl = [x for x in os.listdir(path) if os.path.isdir(os.path.join(path, x)) and contains in x.lower()]
     return sdl
 
-def get_detections_dir(site_path : str) -> str:
-    sp = os.path.normpath(site_path)
-    bn = os.path.basename(sp)
-    pd = os.path.dirname(sp)
-    outp = os.path.join(pd, bn + "_Detections")
-    # outp = uniquify_dir(outp)
+def _get_child_dir(site_path : str, child_name : str = "Detections") -> str:
+    sp = os.path.abspath(site_path)
+    outp = os.path.join(sp, child_name)
     return outp
 
-def get_flight_target_dir(flight_inputdir : str) -> str:
+def get_labels_dir(site_path : str) -> str:
+    return _get_child_dir(site_path, "labels")
+
+def get_detections_dir(site_path : str) -> str:
+    return _get_child_dir(site_path)
+
+def get_flight_dir(flight_inputdir : str, child_name : str = "Detections") -> str:
     sp = os.path.normpath(flight_inputdir)
     flight_name = os.path.basename(sp)
     site_name = os.path.dirname(sp)
-    site_outname = get_detections_dir(site_name)
+    site_outname = _get_child_dir(site_name, child_name)
     flight_target = os.path.join(site_outname, flight_name)
     return flight_target
 

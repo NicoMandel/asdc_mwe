@@ -14,7 +14,7 @@ from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
 from utils import read_arw_as_pil, read_config, save_image, convert_pred_to_np\
-,get_detections_dir, get_model, get_flight_target_dir
+, get_model, get_flight_dir, get_labels_dir, convert_pred_to_txt
 from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
     parser.add_argument("-o", "--output", action="store_true", help="Boolean value. If given, will create output folder structure")
     parser.add_argument("-m", "--model", default=None, help="Path to model file. If None given, will take first .pt file from <config> directory")
+    parser.add_argument("--labels", action="store_true", help="If flag is set, will also store a directory with label files in yolov5 format.")
     parser.add_argument("-c", "--config", default=conff, type=str, help="Which file to use for configs. Defaults to sahi_config.yaml in the <config> directory")
     args = parser.parse_args()
     return vars(args)
@@ -63,9 +64,16 @@ if __name__=="__main__":
      
     # folder setup - only if out bool is set
     if out_bool:
-        target_subdir = get_flight_target_dir(source_dir)
+        target_subdir = get_flight_dir(source_dir)
         os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
         print("Created subdirectory {} for visuals".format(target_subdir))
+
+    # Label folders
+    label_bool = args["labels"]
+    if label_bool:
+        label_dir = get_flight_dir(source_dir, "labels")
+        os.makedirs(label_dir, exist_ok=False)
+        print("Created subdirectory {} for labels".format(label_dir))
 
     # Get single image result prediction
     image_iterator = list_files(
@@ -115,6 +123,9 @@ if __name__=="__main__":
             print(matplotlib.get_backend())
             plt.imshow(image)
             plt.show()
+        
+        if label_bool:
+            convert_pred_to_txt(result, label_dir, imgf)
 
     elapsed_time = time.time() - elapsed_time
     print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(

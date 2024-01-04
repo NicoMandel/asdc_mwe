@@ -13,8 +13,8 @@ from sahi.predict import get_sliced_prediction
 from sahi.utils.file import list_files
 from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
-from utils import find_model_files, read_arw_as_pil, read_config, save_image, convert_pred_to_np, list_subdirectories\
-,get_detections_dir, get_model
+from utils import read_arw_as_pil, read_config, save_image, convert_pred_to_np, list_subdirectories\
+,get_detections_dir, get_model, get_labels_dir, convert_pred_to_txt
 from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("-i", "--input", required=False, type=str, help="Location of the input folder", default=datadir)
     parser.add_argument("-o", "--output", action="store_true", help="Boolean value. If given, will create output folder structure")
     parser.add_argument("-m", "--model", default=None, help="Path to model file. If None given, will take first .pt file from <config> directory")
+    parser.add_argument("--labels", action="store_true", help="If flag is set, will also store a directory with label files in yolov5 format.")
     parser.add_argument("-c", "--config", default=conff, type=str, help="Which file to use for configs. Defaults to sahi_config.yaml in the <config> directory")
     args = parser.parse_args()
     return vars(args)
@@ -70,14 +71,28 @@ if __name__=="__main__":
     # folder setup - only if out bool is set
     if out_bool:
         target_dir = get_detections_dir(source_dir)
-        os.makedirs(target_dir, exist_ok=True)
+        os.makedirs(target_dir, exist_ok=False)
         print("Writing to: {}".format(target_dir))
+
+    # Label folders
+    label_bool = args["labels"]
+    if label_bool:
+        label_dir = get_labels_dir(source_dir)
+        os.makedirs(label_dir, exist_ok=False)
+        print("Writing labels to: {}".format(label_dir))
+
 
     for source_subdir in tqdm(process_dirs, leave=True):
         if out_bool:
             target_subdir = os.path.join(target_dir, source_subdir)
             os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
             print("Created subdirectory {} for visuals".format(target_subdir))
+        
+        if label_bool:
+            label_subdir = os.path.join(label_dir, source_subdir)
+            os.makedirs(label_subdir, exist_ok=False)
+            print("Created subdirectory {} for labels".format(label_subdir))
+        
 
         source_image_dir = os.path.join(source_dir, source_subdir)
         # Get single image result prediction
@@ -120,7 +135,7 @@ if __name__=="__main__":
                 hide_conf=False,
                 padding_px= padding_px,
             )
-
+            
             if out_bool:
                 save_image(image, target_subdir, imgf + "_vis",  export_format)
             else:
@@ -129,6 +144,11 @@ if __name__=="__main__":
                 plt.imshow(image)
                 plt.show()
 
+            # if saving labels:
+            if label_bool:
+                convert_pred_to_txt(result, label_subdir, imgf)
+
+        # Folder Statistics
         elapsed_time = time.time() - elapsed_time
         print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(
             elapsed_time, len(image_iterator), elapsed_time / len(image_iterator)
