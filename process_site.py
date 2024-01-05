@@ -15,6 +15,7 @@ from sahi.utils.cv import IMAGE_EXTENSIONS, read_image_as_pil
 
 from model_utils import read_arw_as_pil, save_image, convert_pred_to_np, get_model, convert_pred_to_txt
 from file_utils import get_detections_dir, get_labels_dir, read_config, list_subdirectories
+from log_utils import log_exists, read_log, append_to_log
 from visualise_bbox import visualize_object_predictions
 
 IMAGE_EXTENSIONS += [".arw"]
@@ -71,7 +72,7 @@ if __name__=="__main__":
     # folder setup - only if out bool is set
     if out_bool:
         target_dir = get_detections_dir(source_dir)
-        os.makedirs(target_dir, exist_ok=False)
+        os.makedirs(target_dir, exist_ok=True)
         print("Writing to: {}".format(target_dir))
 
     # Label folders
@@ -82,14 +83,17 @@ if __name__=="__main__":
         print("Writing labels to: {}".format(label_dir))
 
     for source_subdir in tqdm(process_dirs, leave=True):
+        log_list = []
         if out_bool:
             target_subdir = os.path.join(target_dir, source_subdir)
             os.makedirs(target_subdir, exist_ok=True)       # TODO - error catching here - if force flag not set, do not overwrite
             print("Writing visuals to {}".format(target_subdir))
-        
+            if log_exists(target_subdir):
+                log_list = read_log(target_subdir)
+
         if label_bool:
             label_subdir = os.path.join(label_dir, source_subdir)
-            os.makedirs(label_subdir, exist_ok=False)
+            os.makedirs(label_subdir, exist_ok=True)
             print("Writing labels to {}".format(label_subdir))
         
 
@@ -105,6 +109,11 @@ if __name__=="__main__":
         for ind, image_path in enumerate(
                 tqdm(image_iterator, f"Performing inference on {source_image_dir}", leave=True)
             ):
+            imgf = os.path.basename(image_path).split(".")[0]
+            if imgf in log_list:
+                print("Image with id {} already exists in log. Skipping".format(imgf))
+                continue
+
             if image_path.endswith("ARW"):
                 image_as_pil = read_arw_as_pil(image_path)
             else:
@@ -118,7 +127,6 @@ if __name__=="__main__":
                 overlap_height_ratio = overlap_height_ratio,
                 overlap_width_ratio = overlap_width_ratio
             )
-            imgf = os.path.basename(image_path).split(".")[0]
             
             # converting to numpy format
             bbox_np = convert_pred_to_np(result)
@@ -137,6 +145,7 @@ if __name__=="__main__":
             
             if out_bool:
                 save_image(image, target_subdir, imgf + "_vis",  export_format)
+                append_to_log(target_subdir, imgf)
             else:
                 matplotlib.use('TkAgg')
                 print(matplotlib.get_backend())
