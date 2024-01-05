@@ -46,4 +46,3 @@ def get_flight_dir(flight_inputdir : str, child_name : str = "Detections") -> st
     site_outname = _get_child_dir(site_name, child_name)
     flight_target = os.path.join(site_outname, flight_name)
     return flight_target
-    
