@@ -7,5 +7,5 @@ overlap_width_ratio: 0.3
 # visualisation settings
 padding_px: 70
 bbox_thickness:  15
-export_format:  "png"
+export_format:  "jpg"
 hide_labels: True
