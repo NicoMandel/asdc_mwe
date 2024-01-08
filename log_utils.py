@@ -8,7 +8,7 @@ def _logpath(dirp : str) -> str:
 def append_to_log(flight_dir : str, img_id : str) -> None:
     fpath = _logpath(flight_dir)
     with open(fpath, "a") as f:
-        f.write(img_id)
+        f.write(img_id + "\n")
     return None
 
 def log_exists(flight_dir : str) -> bool:

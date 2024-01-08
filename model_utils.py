@@ -106,7 +106,7 @@ def convert_pred_to_txt(pred, target_dir, img_name : str = "labels"):
 
 def convert_pred_to_np(pred : np.ndarray) -> np.ndarray:
     yolo_bboxes = convert_pred(pred)
-    return np.asarray(yolo_bboxes)
+    return np.asarray(yolo_bboxes) if yolo_bboxes else None
 
 def get_model(path : str, confidence : float, model_type : str = "yolov5" , model_device : str = "cuda:0") -> AutoDetectionModel:
     if path == None:

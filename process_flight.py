@@ -98,31 +98,35 @@ def run_single_flight(
         # converting to numpy format
         bbox_np = convert_pred_to_np(result)
         
-        image, _ = visualize_object_predictions(
-            np.ascontiguousarray(image_as_pil),
-            object_prediction_list=bbox_np,
-            rect_th=bbox_thickness,
-            text_size=None,
-            text_th=None,
-            # color: tuple = None,
-            hide_labels=hide_labels,
-            hide_conf=False,
-            padding_px= padding_px,
-        )
-        
-        if out_bool:
-            save_image(image, target_dir, imgf + "_vis",  export_format)
-            append_to_log(target_dir, imgf)
+        if np.any(bbox_np):
+            image, _ = visualize_object_predictions(
+                np.ascontiguousarray(image_as_pil),
+                object_prediction_list=bbox_np,
+                rect_th=bbox_thickness,
+                text_size=None,
+                text_th=None,
+                # color: tuple = None,
+                hide_labels=hide_labels,
+                hide_conf=False,
+                padding_px= padding_px,
+            )
+            
+            if out_bool:
+                save_image(image, target_dir, imgf + "_vis",  export_format)
+                append_to_log(target_dir, imgf)
+            else:
+                matplotlib.use('TkAgg')
+                print(matplotlib.get_backend())
+                plt.imshow(image)
+                plt.show()
+
+            # if saving labels:
+            if label_bool:
+                convert_pred_to_txt(result, target_labels, imgf)
         else:
-            matplotlib.use('TkAgg')
-            print(matplotlib.get_backend())
-            plt.imshow(image)
-            plt.show()
-
-        # if saving labels:
-        if label_bool:
-            convert_pred_to_txt(result, target_labels, imgf)
-
+            print("No predictions in image {}. Skipping".format(imgf))
+            if out_bool:
+                append_to_log(target_dir, imgf)
     # Folder Statistics
     elapsed_time = time.time() - elapsed_time
     print("Took {:.2f} seconds to run {} images, so {:.2f} s / image".format(
